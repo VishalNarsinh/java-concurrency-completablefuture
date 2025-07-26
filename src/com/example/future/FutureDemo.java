@@ -10,8 +10,8 @@ import java.util.concurrent.Future;
 public class FutureDemo {
     public static void main(String[] args) {
         try {
-            // Create a virtual thread per task executor (lightweight threads introduced in Java 21)
-            try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+            // Create a fixed thread pool with 2 threads
+            try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
                 FileService fileService = new FileService();
 
                 // Define a task to upload an image

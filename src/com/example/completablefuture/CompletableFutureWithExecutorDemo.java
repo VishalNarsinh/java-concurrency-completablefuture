@@ -14,14 +14,20 @@ public class CompletableFutureWithExecutorDemo {
 
             FileService fileService = new FileService();
 
-//            Create a virtual thread per task executor
-            try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+            // Create a fixed thread pool with 2 threads
+            try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
 
                 // Run 'uploadImage' asynchronously using the custom thread pool
-                CompletableFuture<String> imageFuture = CompletableFuture.supplyAsync(fileService::uploadImage, executorService);
+                CompletableFuture<String> imageFuture = CompletableFuture.supplyAsync(()->{
+                    System.out.println("Image task executed by: " + Thread.currentThread().getName());
+                    return fileService.uploadImage();
+                }, executorService);
 
                 // Run 'saveVideo' asynchronously using the same executor
-                CompletableFuture<String> videoFuture = CompletableFuture.supplyAsync(fileService::saveVideo, executorService);
+                CompletableFuture<String> videoFuture = CompletableFuture.supplyAsync(()->{
+                    System.out.println("Video task executed by: " + Thread.currentThread().getName());
+                    return fileService.saveVideo();
+                }, executorService);
 
                 // Print result of image upload once completed
                 imageFuture.thenAccept(System.out::println);
